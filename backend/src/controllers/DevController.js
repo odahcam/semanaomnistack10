@@ -13,7 +13,7 @@ module.exports = {
 
         const { github_username, techs, latitude, longitude } = request.body;
 
-        const dev = Dev.findOne({ github_username });
+        const dev = await Dev.findOne({ github_username });
 
         if (dev) {
             return response.json(dev);
@@ -45,20 +45,21 @@ module.exports = {
         const devSent = request.body;
         const id = request.uri.id;
 
-        const dev = Dev.findOne({ id });
+        const dev = await Dev.findOne({ id });
 
         if (!dev) {
             return response.status(404);
         }
 
         const dataToUpdate = {
+            ...dev,
             nome: devSent.nome,
             bio: devSent.bio,
             avatar_url: devSent.avatar_url,
         }
 
         try {
-            Dev.updateOne({ id }, dataToUpdate)
+            await Dev.updateOne({ id }, dataToUpdate)
         }
         catch (e) {
             return response.status(500)
@@ -72,7 +73,7 @@ module.exports = {
         const id = request.uri.id;
 
         try {
-            Dev.deleteOne({ id })
+            await Dev.deleteOne({ id })
         } catch (e) {
             return response.status(200)
         }

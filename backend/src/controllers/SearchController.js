@@ -11,15 +11,13 @@ module.exports = {
      */
     async index(request, response) {
 
-        const { latitude, longitude, techString } = request.query;
+        const { latitude, longitude, techs } = request.query;
 
-        console.log(latitude, longitude, techString)
+        const techsArray = parseStringAsArray(techs)
 
-        const techs = parseStringAsArray(techString)
-
-        const devs = Dev.find({
+        const devs = await Dev.find({
             techs: {
-                $in: techs,
+                $in: techsArray,
             },
             location: {
                 $near: {
@@ -32,7 +30,7 @@ module.exports = {
             },
         })
 
-        return response.json({ devs });
+        return response.json(devs);
     },
 
 }
