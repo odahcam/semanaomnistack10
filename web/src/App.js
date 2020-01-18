@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
 
     async function loadDevs(params) {
-      const response = await api.get('./devs')
+      const response = await api.get('/devs')
       setDevs(response.data)
     }
 
@@ -29,7 +29,7 @@ function App() {
   }, [])
 
   async function handleAddDev(data) {
-    const response = await api.post('/devs', )
+    const response = await api.post('/devs', data)
     setDevs([...devs, response.data])
   }
 

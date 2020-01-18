@@ -13,7 +13,7 @@ module.exports = {
 
         const { latitude, longitude, techs } = request.query;
 
-        const techsArray = parseStringAsArray(techs)
+        const techsArray = parseStringAsArray(techs).map(x => x.toLowerCase())
 
         const devs = await Dev.find({
             techs: {
@@ -25,10 +25,12 @@ module.exports = {
                         type: 'Point',
                         coordinates: [longitude, latitude],
                     },
-                    $masDistance: 10000,
+
                 },
             },
         })
+
+        console.log(devs);
 
         return response.json(devs);
     },
