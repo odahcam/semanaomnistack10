@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import MapView, { Marker, Callout } from "react-native-maps";
-import { StyleSheet, Image, View, Text, TextInput, TouchableOpacity } from "react-native";
+import { StyleSheet, Image, View, Text, TextInput, TouchableOpacity, EventSubscriptionVendor } from "react-native";
 import { requestPermissionsAsync, getCurrentPositionAsync } from "expo-location";
 import { MaterialIcons } from '@expo/vector-icons'
 import api from "../services/api";
+import { connect, disconnect, subscribeToNewDevs } from "../services/socket";
 
 function Main({ navigation }) {
 
@@ -31,6 +32,23 @@ function Main({ navigation }) {
 
     }, [])
 
+    useEffect(() => {
+        subscribeToNewDevs(dev => setDevs([...devs, dev]))
+    }, [devs])
+
+    async function setupWebsocket() {
+        
+        disconnect()
+
+        const { latitude, longitude } = currentRegion
+
+        connect(
+            latitude,
+            longitude,
+            techs,
+        )
+    }
+
     async function loadDevs() {
         const { latitude, longitude } = currentRegion
 
@@ -38,11 +56,12 @@ function Main({ navigation }) {
             params: {
                 latitude,
                 longitude,
-                techs 
+                techs
             }
         })
 
         setDevs(response.data)
+        setupWebsocket()
     }
 
     function handleRegionChanged(region) {
@@ -63,7 +82,7 @@ function Main({ navigation }) {
                     <Marker key={dev._id} coordinate={{ latitude: dev.location.coordinates[1], longitude: dev.location.coordinates[0] }}>
                         <Image style={styles.avatar} source={{ uri: dev.avatar_url }} />
                         <Callout onPress={() => {
-                            navigation.navigate('Profile', { github_username: dev.github_username  })
+                            navigation.navigate('Profile', { github_username: dev.github_username })
                         }}>
                             <View style={styles.callout}>
                                 <Text style={styles.devName}>{dev.name}</Text>
